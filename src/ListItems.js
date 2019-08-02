@@ -8,7 +8,7 @@ export const ListItems = () => {
       const topStoriesUrl ='https://hacker-news.firebaseio.com/v0/topstories.json';
       const storiesBaseUrl = 'https://hacker-news.firebaseio.com/v0/item/';
 
-      // get top stories ids and take first 20 items
+      // get top 20 stories ids and then fetch stories
       // then fetch news with those items
       axios.get(topStoriesUrl)
           .then(response => response.data.slice(0,19).map(id => {
@@ -16,16 +16,20 @@ export const ListItems = () => {
               return axios.get(url);
           }))
           .then(promises => axios.all(promises))
-          .then(listOfStories => setStories(listOfStories));
+          .then(listOfStories => setStories(listOfStories.map(story=>story.data)));
   };
-
-  // Run fetch stories when component loads
+  // Run fetch sot when component loads
   useEffect(() => {
       fetchStories();
   }, []);
 
-  return (
-      <h2>Top stories</h2>
+    const renderStories = stories.map((story) => <li key={story.id}>{story.title}</li>);
+    console.log(stories);
 
+  return (
+      <div>
+          <h2>Top stories</h2>
+      {renderStories}
+      </div>
   );
 };
