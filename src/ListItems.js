@@ -57,7 +57,7 @@ export const ListItems = () => {
 
   return (
     <div>
-      <h2>Top stories</h2>
+      <h2>Check out stories</h2>
       {stories.length === 0 ? <p>Loading...</p> : renderStories}
     </div>
   );
