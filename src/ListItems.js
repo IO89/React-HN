@@ -1,7 +1,6 @@
 import React, {useState, useEffect} from "react";
 import axios from "axios";
 import {Link} from "react-router-dom";
-import {Bar,BarChart} from 'recharts';
 
 export const ListItems = () => {
     const [stories, setStories] = useState([]);
