@@ -44,7 +44,7 @@ export const ListItems = () => {
                                     {story.title}
                                 </a>
                             </div>
-                            <div className="meta">{date.toUTCString(story.time)}</div>
+                            <div className="meta"> {date.toDateString(story.time)}</div>
                             <div className="description">
                                 <p>
                                     Created by{" "}
