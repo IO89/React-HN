@@ -31,32 +31,38 @@ export const ListItems = () => {
         fetchStories();
     }, []);
 
+
     //title, creator, score, human readable created time, and a link to open that story in another tab.
     const renderStories = stories.map((story) => {
         let date = new Date();
         return (
-            <div key={story.by} className="ui centered card">
-                <div className="content">
-                    <div className="header">
-                        <a href={story.url} target="_blank">
-                            {story.title}
-                        </a>
+            <div key={story.by} className="ui container">
+                <div className="ui segments">
+                    <div className="ui center aligned segment">
+                        <div className="content">
+                            <div className="header">
+                                <a href={story.url} target="_blank">
+                                    {story.title}
+                                </a>
+                            </div>
+                            <div className="meta">{date.toUTCString(story.time)}</div>
+                            <div className="description">
+                                <p>
+                                    Created by{" "}
+                                    <Link to={`/users/${story.by}`} className="item" key={story.by}>
+                                        {story.by}
+                                    </Link>
+                                </p>
+                            </div>
+                        </div>
+                        <div className="extra content">
+                            <i className="star icon"/>
+                            {story.score}
+                        </div>
                     </div>
-                    <div className="meta">{date.toUTCString(story.time)}</div>
-                    <div className="description">
-                        <p>
-                            Created by{" "}
-                            <Link to={`/users/${story.by}`} className="item" key={story.by}>
-                                {story.by}
-                            </Link>
-                        </p>
-                    </div>
-                </div>
-                <div className="extra content">
-                    <i className="star icon"/>
-                    {story.score}
                 </div>
             </div>
+
         );
     });
 
