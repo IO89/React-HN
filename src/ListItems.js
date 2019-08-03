@@ -31,6 +31,7 @@ export const ListItems = () => {
         fetchStories();
     }, []);
 
+
     //title, creator, score, human readable created time, and a link to open that story in another tab.
     const renderStories = stories.map((story) => {
         let date = new Date();
@@ -59,9 +60,18 @@ export const ListItems = () => {
             </div>
         );
     });
+    const renderBarChart = stories.map((story, index) => {
+        return (
+            <div className="ui black inverted progress">
+                <div className="bar">
+                    <div className="progress">{story.score}</div>
+                </div>
+            </div>)
+    });
 
     return (
         <div>
+            {/*{renderBarChart}*/}
             {stories.length === 0 ? <div className="ui active centered inline loader"/> : renderStories}
         </div>
     );
