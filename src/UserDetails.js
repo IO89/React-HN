@@ -14,19 +14,21 @@ export const UserDetails = (props) => {
     const renderUser = () => {
         let date = new Date();
         return (
-            <div className="ui centered card ">
-                <div className="content">
-                    <div className="header">{user.id}</div>
-                    <div className="meta">
-                        <span>Registered: {date.toDateString(user.created)}</span>
-                    </div>
-                    <div className="extra content">
-                        <i className="star icon"/>
-                        Karma points:{user.karma}
-                    </div>
-                    <div className="extra content">
-                        <i className="paper plane icon"/>
-                        Submitted :{user.submitted.length}
+            <div className="ui container">
+                <div className="ui centered card ">
+                    <div className="content">
+                        <div className="header">{user.id}</div>
+                        <div className="meta">
+                            <span>Registered: {date.toDateString(user.created)}</span>
+                        </div>
+                        <div className="extra content">
+                            <i className="star icon"/>
+                            Karma points:{user.karma}
+                        </div>
+                        <div className="extra content">
+                            <i className="paper plane icon"/>
+                            Submitted :{user.submitted.length}
+                        </div>
                     </div>
                 </div>
             </div>
