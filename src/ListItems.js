@@ -1,6 +1,7 @@
 import React, {useState, useEffect} from "react";
 import axios from "axios";
 import {Link} from "react-router-dom";
+import {Bar,BarChart} from 'recharts';
 
 export const ListItems = () => {
     const [stories, setStories] = useState([]);
@@ -60,18 +61,10 @@ export const ListItems = () => {
             </div>
         );
     });
-    const renderBarChart = stories.map((story, index) => {
-        return (
-            <div className="ui black inverted progress">
-                <div className="bar">
-                    <div className="progress">{story.score}</div>
-                </div>
-            </div>)
-    });
+
 
     return (
         <div>
-            {/*{renderBarChart}*/}
             {stories.length === 0 ? <div className="ui active centered inline loader"/> : renderStories}
         </div>
     );
