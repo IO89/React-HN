@@ -1,3 +1,6 @@
+## Check out demo
+`https://react-hn-m8xo0bku5.now.sh/`
+
 ## Basic information
 
 Install npm modules

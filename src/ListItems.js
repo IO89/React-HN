@@ -36,42 +36,38 @@ export const ListItems = () => {
     const renderStories = stories.map((story) => {
         let date = new Date();
         return (
-            <div key={story.by} className="ui centered card">
-                <div className="content">
-                    <div className="header">
-                        <a href={story.url} target="_blank">
-                            {story.title}
-                        </a>
+            <div key={story.by} className="ui container">
+                <div className="ui segments">
+                    <div className="ui center aligned segment">
+                        <div className="content">
+                            <div className="header">
+                                <a href={story.url} target="_blank">
+                                    {story.title}
+                                </a>
+                            </div>
+                            <div className="meta">{date.toUTCString(story.time)}</div>
+                            <div className="description">
+                                <p>
+                                    Created by{" "}
+                                    <Link to={`/users/${story.by}`} className="item" key={story.by}>
+                                        {story.by}
+                                    </Link>
+                                </p>
+                            </div>
+                        </div>
+                        <div className="extra content">
+                            <i className="star icon"/>
+                            {story.score}
+                        </div>
                     </div>
-                    <div className="meta">{date.toUTCString(story.time)}</div>
-                    <div className="description">
-                        <p>
-                            Created by{" "}
-                            <Link to={`/users/${story.by}`} className="item" key={story.by}>
-                                {story.by}
-                            </Link>
-                        </p>
-                    </div>
-                </div>
-                <div className="extra content">
-                    <i className="star icon"/>
-                    {story.score}
                 </div>
             </div>
+
         );
-    });
-    const renderBarChart = stories.map((story, index) => {
-        return (
-            <div className="ui black inverted progress">
-                <div className="bar">
-                    <div className="progress">{story.score}</div>
-                </div>
-            </div>)
     });
 
     return (
         <div>
-            {/*{renderBarChart}*/}
             {stories.length === 0 ? <div className="ui active centered inline loader"/> : renderStories}
         </div>
     );
