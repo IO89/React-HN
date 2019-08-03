@@ -31,7 +31,6 @@ export const ListItems = () => {
         fetchStories();
     }, []);
 
-
     //title, creator, score, human readable created time, and a link to open that story in another tab.
     const renderStories = stories.map((story) => {
         let date = new Date();
