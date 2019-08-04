@@ -31,11 +31,10 @@ export const ListItems = () => {
         fetchStories();
     }, []);
 
-    //title, creator, score, human readable created time, and a link to open that story in another tab.
-    const renderStories = stories.map((story) => {
+    const renderStories = stories.map((story, index) => {
         let date = new Date();
         return (
-            <div key={story.by} className="ui container">
+            <div key={index} className="ui container">
                 <div className="ui segments">
                     <div className="ui center aligned segment">
                         <div className="content">
@@ -65,8 +64,39 @@ export const ListItems = () => {
         );
     });
 
+    const sortScoreLowest = () => {
+        const lowestScore = stories.sort((a, b) => a.score - b.score);
+        setStories([...stories, lowestScore])
+    };
+
+    const sortScoreHighest = () => {
+        const highestScore = stories.sort((a, b) => b.score - a.score);
+        setStories([...stories, highestScore])
+    };
+
+    const renderSortStories = () => {
+        return (
+            <div className="ui center aligned container">
+                <button className="ui labeled button"
+                        onClick={sortScoreHighest}
+                >
+                    <i className="arrow up icon"/>
+                    Highest score
+                </button>
+                <button className="ui labeled button"
+                        onClick={sortScoreLowest}>
+                    < i className="arrow down icon"/>
+                    Lowest score
+                </button>
+            </div>
+        );
+    };
+
     return (
         <div>
+            <div>
+                {renderSortStories()}
+            </div>
             {stories.length === 0 ? <div className="ui active centered inline loader"/> : renderStories}
         </div>
     );
