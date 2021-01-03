@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import "./App.css";
 
 type Story = {
@@ -48,6 +48,19 @@ const Search = (props: SearchProps) => {
   );
 };
 
+const usePersistanceState = (
+  key: string,
+  initialState: string
+): [string, Dispatch<SetStateAction<string>>] => {
+  const [value, setValue] = useState(localStorage.getItem(key) || initialState);
+
+  useEffect(() => {
+    localStorage.setItem(key, value);
+  }, [value, key]);
+
+  return [value, setValue];
+};
+
 const App = () => {
   const stories = [
     {
@@ -68,7 +81,7 @@ const App = () => {
     },
   ];
 
-  const [searchTerm, setSearchTerm] = useState("React");
+  const [searchTerm, setSearchTerm] = usePersistanceState("search", "React");
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
