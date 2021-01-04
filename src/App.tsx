@@ -7,7 +7,8 @@ import React, {
   useRef,
   useState,
 } from "react";
-import "./App.css";
+import styles from "./app.module.css";
+import { ReactComponent as Check } from "./check.svg";
 
 type Story = {
   title: string;
@@ -25,16 +26,20 @@ type ItemProps = {
 
 const Item = ({ item, onRemoveItem }: ItemProps) => {
   return (
-    <div key={item.objectID}>
-      <span>
+    <div className={styles.item} key={item.objectID}>
+      <span style={{ width: "40%" }}>
         <a href={item.url}>{item.title}</a>
       </span>
-      <span>{item.author}</span>
-      <span>{item.num_comments}</span>
-      <span>{item.points}</span>
-      <span>
-        <button type="button" onClick={() => onRemoveItem(item)}>
-          Dismiss
+      <span style={{ width: "30%" }}>{item.author}</span>
+      <span style={{ width: "10%" }}>{item.num_comments}</span>
+      <span style={{ width: "10%" }}>{item.points}</span>
+      <span style={{ width: "10%" }}>
+        <button
+          type="button"
+          className={`${styles.button} ${styles.buttonSmall}`}
+          onClick={() => onRemoveItem(item)}
+        >
+          <Check height="18px" width="18px" />
         </button>
       </span>
     </div>
@@ -59,9 +64,9 @@ type SearchProps = {
   value: string;
   id: string;
   label: string;
-  type: string;
-  children: JSX.Element;
-  isFocused: boolean;
+  type?: string;
+  children: React.ReactNode;
+  isFocused?: boolean;
 };
 
 const InputWithLabel = ({
@@ -83,9 +88,17 @@ const InputWithLabel = ({
 
   return (
     <>
-      <label htmlFor={label}>{children}</label>
+      <label htmlFor={label} className={styles.label}>
+        {children}
+      </label>
       &nbsp;
-      <input id={id} type={type} onChange={onInputChange} value={value} />
+      <input
+        id={id}
+        type={type}
+        onChange={onInputChange}
+        value={value}
+        className={styles.input}
+      />
     </>
   );
 };
@@ -94,10 +107,16 @@ const usePersistanceState = (
   key: string,
   initialState: string
 ): [string, Dispatch<SetStateAction<string>>] => {
+  const isMounted = useRef(false);
+
   const [value, setValue] = useState(localStorage.getItem(key) || initialState);
 
   useEffect(() => {
-    localStorage.setItem(key, value);
+    if (!isMounted.current) {
+      isMounted.current = true;
+    } else {
+      localStorage.setItem(key, value);
+    }
   }, [value, key]);
 
   return [value, setValue];
@@ -144,7 +163,7 @@ const API_ENDPOINT = "https://hn.algolia.com/api/v1/search?query=";
 type SearchFormProps = {
   searchTerm: string;
   onSearchInput: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onSearchSubmit: () => void;
+  onSearchSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
 };
 
 const SearchForm = ({
@@ -153,7 +172,7 @@ const SearchForm = ({
   onSearchSubmit,
 }: SearchFormProps) => {
   return (
-    <form onSubmit={onSearchSubmit}>
+    <form onSubmit={onSearchSubmit} className={styles.searchForm}>
       <InputWithLabel
         id="search"
         label="Search"
@@ -164,7 +183,11 @@ const SearchForm = ({
       >
         <strong>Search:</strong>
       </InputWithLabel>
-      <button type="submit" disabled={!searchTerm}>
+      <button
+        type="submit"
+        disabled={!searchTerm}
+        className={`${styles.button} ${styles.buttonLarge}`}
+      >
         Submit
       </button>
     </form>
@@ -184,12 +207,12 @@ const App = () => {
 
   const handleSearchInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
-
-    e.preventDefault();
   };
 
-  const handleSearchSubmit = () => {
+  const handleSearchSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     setUrl(`${API_ENDPOINT}${searchTerm}`);
+
+    e.preventDefault();
   };
 
   const handleFetchStories = useCallback(async () => {
@@ -217,8 +240,8 @@ const App = () => {
   };
 
   return (
-    <>
-      <h1>Hacker stories</h1>
+    <div className={styles.container}>
+      <h1 className={styles.headlinePrimary}>Hacker stories</h1>
       <SearchForm
         searchTerm={searchTerm}
         onSearchInput={handleSearchInput}
@@ -233,8 +256,10 @@ const App = () => {
       ) : (
         <List list={stories.data} onRemoveItem={handleRemoveStory} />
       )}
-    </>
+    </div>
   );
 };
 
 export default App;
+
+export { storiesReducer, SearchForm, InputWithLabel, List, Item };
