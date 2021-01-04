@@ -1,4 +1,12 @@
-import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
+import React, {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useReducer,
+  useRef,
+  useState,
+} from "react";
 import "./App.css";
 
 type Story = {
@@ -53,6 +61,7 @@ type SearchProps = {
   label: string;
   type: string;
   children: JSX.Element;
+  isFocused: boolean;
 };
 
 const InputWithLabel = ({
@@ -62,7 +71,16 @@ const InputWithLabel = ({
   type = "text",
   onInputChange,
   children,
+  isFocused,
 }: SearchProps) => {
+  const inputRef = useRef<HTMLElement>();
+
+  useEffect(() => {
+    if (isFocused && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [isFocused]);
+
   return (
     <>
       <label htmlFor={label}>{children}</label>
@@ -85,62 +103,136 @@ const usePersistanceState = (
   return [value, setValue];
 };
 
-const initialStories = [
-  {
-    title: "React",
-    url: "https://reactjs.org/",
-    author: "Jordan Walke",
-    num_comments: 3,
-    points: 4,
-    objectID: 0,
-  },
-  {
-    title: "Redux",
-    url: "https://redux.js.org/",
-    author: "Dan Abramov, Andrew Clark",
-    num_comments: 2,
-    points: 5,
-    objectID: 1,
-  },
-];
+const storiesReducer = (
+  state: { data: Story[]; isLoading: boolean; isError: boolean },
+  action: { type: string; payload?: any }
+) => {
+  switch (action.type) {
+    case "STORIES_FETCH_INIT":
+      return {
+        ...state,
+        isLoading: true,
+        isError: false,
+      };
+    case "STORIES_FETCH_SUCCESS":
+      return {
+        ...state,
+        isLoading: false,
+        isError: false,
+        data: action.payload,
+      };
+    case "STORIES_FETCH_FAILURE":
+      return {
+        ...state,
+        isLoading: false,
+        isError: true,
+      };
+    case "REMOVE_STORY":
+      return {
+        ...state,
+        data: state.data.filter(
+          (story) => action.payload.objectID !== story.objectID
+        ),
+      };
+    default:
+      throw new Error("Not covered yet");
+  }
+};
 
-const App = () => {
-  const [searchTerm, setSearchTerm] = usePersistanceState("search", "React");
+const API_ENDPOINT = "https://hn.algolia.com/api/v1/search?query=";
 
-  const [stories, setStories] = useState(initialStories);
+type SearchFormProps = {
+  searchTerm: string;
+  onSearchInput: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onSearchSubmit: () => void;
+};
 
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(e.target.value);
-  };
-
-  const handleRemoveStory = (item: Story) => {
-    const newStories = stories.filter(
-      (story) => item.objectID !== story.objectID
-    );
-
-    setStories(newStories);
-  };
-
-  const searchedStories = stories.filter((story) =>
-    story.title.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
+const SearchForm = ({
+  searchTerm,
+  onSearchInput,
+  onSearchSubmit,
+}: SearchFormProps) => {
   return (
-    <>
-      <h1>Hacker stories</h1>
+    <form onSubmit={onSearchSubmit}>
       <InputWithLabel
         id="search"
         label="Search"
         value={searchTerm}
-        onInputChange={handleSearch}
+        onInputChange={onSearchInput}
         type="text"
+        isFocused
       >
         <strong>Search:</strong>
       </InputWithLabel>
+      <button type="submit" disabled={!searchTerm}>
+        Submit
+      </button>
+    </form>
+  );
+};
 
+const App = () => {
+  const [searchTerm, setSearchTerm] = usePersistanceState("search", "React");
+
+  const [url, setUrl] = useState(`${API_ENDPOINT}${searchTerm}`);
+
+  const [stories, dispatchStories] = useReducer(storiesReducer, {
+    data: [],
+    isLoading: false,
+    isError: false,
+  });
+
+  const handleSearchInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+
+    e.preventDefault();
+  };
+
+  const handleSearchSubmit = () => {
+    setUrl(`${API_ENDPOINT}${searchTerm}`);
+  };
+
+  const handleFetchStories = useCallback(async () => {
+    dispatchStories({ type: "STORIES_FETCH_INIT" });
+
+    try {
+      const response = await fetch(url);
+      const result = await response.json();
+
+      dispatchStories({ type: "STORIES_FETCH_SUCCESS", payload: result.hits });
+    } catch {
+      dispatchStories({ type: "STORIES_FETCH_FAILURE" });
+    }
+  }, [url]);
+
+  useEffect(() => {
+    handleFetchStories();
+  }, [handleFetchStories]);
+
+  const handleRemoveStory = (item: Story) => {
+    dispatchStories({
+      type: "REMOVE_STORY",
+      payload: item,
+    });
+  };
+
+  return (
+    <>
+      <h1>Hacker stories</h1>
+      <SearchForm
+        searchTerm={searchTerm}
+        onSearchInput={handleSearchInput}
+        onSearchSubmit={handleSearchSubmit}
+      />
       <hr />
 
-      <List list={searchedStories} onRemoveItem={handleRemoveStory} />
+      {stories.isError && <p>Something went wrong ...</p>}
+
+      {stories.isLoading ? (
+        <p>Loading...</p>
+      ) : (
+        <List list={stories.data} onRemoveItem={handleRemoveStory} />
+      )}
     </>
   );
 };
