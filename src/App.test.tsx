@@ -1,12 +1,8 @@
 import React from "react";
-import { render, screen, fireEvent, act } from "@testing-library/react";
-import App, {
-  storiesReducer,
-  Item,
-  List,
-  SearchForm,
-  InputWithLabel,
-} from "./App";
+import { render, screen, fireEvent } from "@testing-library/react";
+import { storiesReducer } from "./App";
+import Item from "./Item";
+import SearchForm from "./SearchForm";
 
 const storyOne = {
   title: "React",
@@ -118,5 +114,10 @@ describe("SearchForm", () => {
     fireEvent.submit(screen.getByRole("button"));
 
     expect(searchFormProps.onSearchSubmit).toHaveBeenCalledTimes(1);
+  });
+
+  test("renders snapshot", () => {
+    const { container } = render(<SearchForm {...searchFormProps} />);
+    expect(container.firstChild).toMatchSnapshot();
   });
 });
