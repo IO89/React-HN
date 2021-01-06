@@ -1,7 +1,7 @@
 import React from "react";
-import { Story } from "./App";
-import { ReactComponent as Check } from "./check.svg";
-import styles from "./app.module.css";
+import { ReactComponent as Check } from "../assets/check.svg";
+import styles from "../app.module.css";
+import { Story } from "../App";
 
 type ItemProps = {
   item: Story;

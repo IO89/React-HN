@@ -1,16 +1,9 @@
-import React, {
-  Dispatch,
-  SetStateAction,
-  useCallback,
-  useEffect,
-  useReducer,
-  useRef,
-  useState,
-} from "react";
+import React, { useCallback, useEffect, useReducer, useState } from "react";
 import styles from "./app.module.css";
-import LastSearch from "./LastSearch";
-import List from "./List";
-import SearchForm from "./SearchForm";
+import LastSearch from "./components/LastSearch";
+import List from "./components/List";
+import SearchForm from "./components/SearchForm";
+import { usePersistentState } from "./usePersistentState";
 
 export type Story = {
   title: string;
@@ -28,29 +21,10 @@ type StoriesState = {
   page: number;
 };
 
-type ActionType =
+export type ActionType =
   | { type: "REMOVE_STORY"; payload: Story }
   | { type: "STORIES_FETCH_SUCCESS"; payload: { list: Story[]; page: number } }
   | { type: "STORIES_FETCH_INIT" | "STORIES_FETCH_FAILURE" };
-
-const usePersistanceState = (
-  key: string,
-  initialState: string
-): [string, Dispatch<SetStateAction<string>>] => {
-  const isMounted = useRef(false);
-
-  const [value, setValue] = useState(localStorage.getItem(key) || initialState);
-
-  useEffect(() => {
-    if (!isMounted.current) {
-      isMounted.current = true;
-    } else {
-      localStorage.setItem(key, value);
-    }
-  }, [value, key]);
-
-  return [value, setValue];
-};
 
 const storiesReducer = (state: StoriesState, action: ActionType) => {
   switch (action.type) {
@@ -123,7 +97,7 @@ const getUrl = (searchTerm: string, page: number) =>
   `${API_BASE}${API_SEARCH}?${PARAM_SEARCH}${searchTerm}&${PARAM_PAGE}${page}`;
 
 const App = () => {
-  const [searchTerm, setSearchTerm] = usePersistanceState("search", "React");
+  const [searchTerm, setSearchTerm] = usePersistentState("search", "React");
   const [urls, setUrls] = useState([getUrl(searchTerm, 0)]);
   const [stories, dispatchStories] = useReducer(storiesReducer, {
     data: [],

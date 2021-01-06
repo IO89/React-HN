@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import { Story } from "./App";
 import Item from "./Item";
 import { sortBy, prop } from "ramda";
-import { ReactComponent as Up } from "./upload.svg";
-import { ReactComponent as Down } from "./download.svg";
+import { ReactComponent as Up } from "../assets/upload.svg";
+import { ReactComponent as Down } from "../assets/download.svg";
+import { Story } from "../App";
 
 type ListProps = {
   list: Story[];

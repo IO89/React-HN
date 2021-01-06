@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import styles from "./app.module.css";
+import styles from "../app.module.css";
 
 type InputWithLabelProps = {
   onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;

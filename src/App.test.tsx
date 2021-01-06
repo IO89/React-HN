@@ -1,8 +1,8 @@
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
-import { storiesReducer } from "./App";
-import Item from "./Item";
-import SearchForm from "./SearchForm";
+import { ActionType, storiesReducer } from "./App";
+import Item from "./components/Item";
+import SearchForm from "./components/SearchForm";
 
 const storyOne = {
   title: "React",
@@ -26,9 +26,9 @@ const stories = [storyOne, storyTwo];
 
 describe("storiesReducer", () => {
   test("removes a story from all stories", () => {
-    const action = { type: "REMOVE_STORY", payload: storyOne };
+    const action: ActionType = { type: "REMOVE_STORY", payload: storyOne };
 
-    const state = { data: stories, isLoading: false, isError: false };
+    const state = { data: stories, isLoading: false, isError: false, page: 0 };
 
     const newState = storiesReducer(state, action);
 
@@ -36,21 +36,26 @@ describe("storiesReducer", () => {
       data: [storyTwo],
       isLoading: false,
       isError: false,
+      page: 0,
     };
 
     expect(newState).toStrictEqual(expectedState);
   });
 
   test("add story", () => {
-    const action = { type: "STORIES_FETCH_SUCCESS", payload: storyTwo };
-    const state = { data: stories, isLoading: false, isError: false };
+    const action: ActionType = {
+      type: "STORIES_FETCH_SUCCESS",
+      payload: { list: [storyTwo], page: 0 },
+    };
+    const state = { data: stories, isLoading: false, isError: false, page: 0 };
 
     const newState = storiesReducer(state, action);
 
     const expectedState = {
-      data: storyTwo,
+      data: [storyTwo],
       isLoading: false,
       isError: false,
+      page: 0,
     };
 
     expect(newState).toStrictEqual(expectedState);
